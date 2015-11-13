@@ -3,7 +3,8 @@ function mlp = mlp_train(hiddenLayers, xs, ts, learningRate, varargin)
 % REFERENCES
 %   * http://ml.informatik.uni-freiburg.de/_media/documents/teaching/ss09/ml/mlps.pdf
 %   * http://stackoverflow.com/questions/3775032/how-to-update-the-bias-in-neural-network-backpropagation
-%   
+%   * http://rolisz.ro/2013/04/18/neural-networks-in-python/
+%   * https://www.willamette.edu/~gorr/classes/cs449/backprop.html
 p = inputParser;
 addRequired(p, 'hiddenLayers');
 addRequired(p, 'x');
@@ -21,8 +22,10 @@ layerCount = length(layers);
 activationFn = p.Results.activationFn;
 if strcmp(activationFn, 'logsig')
     f = @logsig;
+    df = @(x) dlogsig(x, logsig(x));
 elseif strcmp(activationFn, 'tansig')
     f = @tansig;
+    df = @(x) dtansig(x, tansig(x));
 else
     assert(false, 'Invalid activation function.');
 end
@@ -43,9 +46,10 @@ for i = 2:layerCount
     end
 end
 
-
-for xi = 1:length(xs)
-    x = xs(xi, :);
+% For each input vector.
+for k = 1:length(xs)
+    x = xs(k, :);
+    t = ts(k, :);
     
     % FEED FORWARD STEP
     % ===================
@@ -55,14 +59,29 @@ for xi = 1:length(xs)
     o{1} = x;
     % For hidden and output layers...
     for i = 2:layerCount
-        n = layers(i);
-        net = zeros(1, n);
-        for j = 1:n
-            net(j) = b{i}(j) + dot(w{i}(j, :), o{i - 1});
-        end
+        net = b{i} + dot(w{i}, repmat(o{i - 1}, layers(i), 1), 2)';
         o{i} = f(net);
     end
-    display(o);
+    
+    % BACK PROPAGATION STEP
+    % =====================
+    %
+    d = cell(1, layerCount);
+    error = t - o{end};
+    d{end} = error .* df(o{end});
+    for i = (layerCount - 1):-1:2
+%         display(w{i});
+%         display(repmat(d{i + 1}, layers(i), 1));
+%         d{i} = dot(w{i}, repmat(d{i + 1}, layers(i), 1), 2)' .* df(o{i});
+        n = layers(i);
+        di = zeros(1, n);
+        for j = 1:n
+            display(w{i}(j, :));
+            display(d{i + 1});
+            di(j) = dot(w{i + 1}(j, :), d{i + 1});
+        end
+        d{i} = di .* df(o{i});
+    end
 end
 
 mlp = struct('weights', w, 'bias', b, 'layers', layers, 'activationFn', activationFn);
