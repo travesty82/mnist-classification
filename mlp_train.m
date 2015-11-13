@@ -62,6 +62,10 @@ genRandom = @(m, n) (rand(m, n) * 0.5) - 0.25;
 w = cell(1, layerCount);
 b = cell(1, layerCount);
 for i = 2:layerCount
+    % b{i} is initialized to a vector such that there is one bias value
+    % per neuron in layer i. w{i} is initialized to a matrix such that
+    % value of w{i}(k, j) is the weight of the connection from neuron j to
+    % neuron k, where k is a neuron that exists in layer i.
     if p.Results.randomize
         w{i} = genRandom(layers(i), layers(i - 1));
         b{i} = genRandom(1, layers(i));
@@ -81,9 +85,12 @@ while true
         x = xs(s, :);
         t = ts(s, :);
 
-        % FEED FORWARD
+        % FEED FORWARD: Calculate outputs
         % ============
         %
+        % o is a cell array that contains the output values for each
+        % neuron of each layer. o{i} is the vector containing the output
+        % values for all neurons on layer i.
         o = cell(1, layerCount);
         % "Output" for input layer is just the input vector.
         o{1} = x;
@@ -92,13 +99,15 @@ while true
             o{i} = f(b{i} + sum(w{i} * o{i - 1}'));
         end
 
-        % BACK PROPAGATION
+        % BACK PROPAGATION: Calculate deltas
         % ================
         %
+        % Like o, d contains deltas for each neuron of each layer.
         d = cell(1, layerCount);
+        % Calculate delta for output layer
         error = t - o{end};
-        cumulativeError = cumulativeError + (1/2) .* sum(error .^ 2);
         d{end} = error .* df(o{end});
+        % Calculate delta for hidden layers
         for i = (layerCount - 1):-1:2
             d{i} = df(o{i}) .* sum(sum(w{i + 1}, 2) .* d{i + 1}');
         end
