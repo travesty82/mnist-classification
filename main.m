@@ -10,4 +10,4 @@ perceptron_predict(p, [1 0 0]);
 
 x = [0 0; 0 1; 1 0; 1 1];
 t = [1; 1; 1; 0];
-mlp = mlp_train([2], x, t, 0.1);
+mlp = mlp_train([3 2], x, t, 0.1, 'logsig', 'threshold', 0.4);

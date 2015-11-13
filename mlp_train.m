@@ -13,6 +13,7 @@ addRequired(p, 't');
 addRequired(p, 'learningRate', @isnumeric);
 addOptional(p, 'activationFn', 'logsig', @ischar);
 addParameter(p, 'numIter', 0, @isnumeric);
+addParameter(p, 'threshold', 0, @isnumeric);
 addParameter(p, 'randomize', true, @isboolean);
 parse(p, hiddenLayers, xs, ts, learningRate, varargin{:});
 
@@ -31,7 +32,7 @@ else
     assert(false, 'Invalid activation function.');
 end
 
-rng(95);
+rng(40);
 
 % Initialize the weights and biases to either zero or small random
 % values in the range [-0.25, 0.25] depending on whether the
@@ -49,40 +50,55 @@ for i = 2:layerCount
     end
 end
 
-% For each input vector.
-for s = 1:length(xs)
-    x = xs(s, :);
-    t = ts(s, :);
-    
-    % FEED FORWARD
-    % ============
-    %
-    o = cell(1, layerCount);
-    % "Output" for input layer is just the input vector.
-    o{1} = x;
-    % For hidden and output layers...
-    for i = 2:layerCount
-        o{i} = f(b{i} + sum(w{i} * o{i - 1}'));
+numIter = p.Results.numIter;
+threshold = p.Results.threshold;
+iter = 0;
+while true
+    cumulativeError = 0;
+    % One epoch of training
+    for s = 1:length(xs)
+        x = xs(s, :);
+        t = ts(s, :);
+
+        % FEED FORWARD
+        % ============
+        %
+        o = cell(1, layerCount);
+        % "Output" for input layer is just the input vector.
+        o{1} = x;
+        % For hidden and output layers...
+        for i = 2:layerCount
+            o{i} = f(b{i} + sum(w{i} * o{i - 1}'));
+        end
+
+        % BACK PROPAGATION
+        % ================
+        %
+        d = cell(1, layerCount);
+        error = t - o{end};
+        cumulativeError = cumulativeError + (1/2) .* sum(error .^ 2);
+        d{end} = error .* df(o{end});
+        for i = (layerCount - 1):-1:2
+            d{i} = df(o{i}) .* sum(sum(w{i + 1}, 2) .* d{i + 1}');
+        end
+
+        % WEIGHT AND BIAS UPDATE
+        % ======================
+        %
+        for i = 2:layerCount
+            w{i} = w{i} + (learningRate * d{i}' * o{i - 1});
+            b{i} = b{i} + (learningRate * d{i});
+        end
     end
     
-    % BACK PROPAGATION
-    % ================
-    %
-    d = cell(1, layerCount);
-    error = t - o{end};
-    d{end} = error .* df(o{end});
-    for i = (layerCount - 1):-1:2
-        d{i} = df(o{i}) .* sum(w{i + 1} * d{i + 1}');
-    end
-    
-    % WEIGHT AND BIAS UPDATE
-    % ======================
-    %
-    for i = 2:layerCount
-        w{i} = w{i} + (learningRate * d{i}' * o{i - 1});
-        b{i} = b{i} + (learningRate * d{i});
+    % Keep training until the specified number of iterations or a specified
+    % error threshold is reached.
+    iter = iter + 1;
+    if numIter > 0 && iter >= numIter
+        break
+    elseif cumulativeError <= threshold
+        break
     end
 end
-
 mlp = struct('weights', w, 'bias', b, 'layers', layers, 'activationFn', activationFn);
 end
