@@ -30,35 +30,40 @@ end
 % Initialize the weights and biases to either zero or small random
 % values in the range [-0.25, 0.25] depending on whether the
 % `randomize` option is specified.
-gen_random = @(z) (rand(1, z) * 0.5) - 0.25;
+genRandom = @(m, n) (rand(m, n) * 0.5) - 0.25;
 w = cell(1, layerCount);
 b = cell(1, layerCount);
-for i = 1:layerCount
-    neuronCount = layers(i);
+for i = 2:layerCount
     if p.Results.randomize
-        w{i} = gen_random(neuronCount);
-        b{i} = gen_random(neuronCount);
+        w{i} = genRandom(layers(i), layers(i - 1));
+        b{i} = genRandom(1, layers(i));
     else
-        w{i} = zeros(1, neuronCount);
-        b{i} = zeros(1, neuronCount);
+        w{i} = zeros(layers(i), layers(i - 1));
+        b{i} = zeros(1, layers(i));
     end
 end
 
-% Input layer should not have any bias, so set all bias
-% values to zero.
-b{1} = zeros(1, size(xs, 2));
 
-% Forward propagation
-for k = 1:length(xs)
-    x = xs(k, :);
-    a = cell(1, layerCount);
-    a{1} = x;
+for xi = 1:length(xs)
+    x = xs(xi, :);
+    
+    % FEED FORWARD STEP
+    % ===================
+    %
+    o = cell(1, layerCount);
+    % "Output" for input layer is just the input vector.
+    o{1} = x;
+    % For hidden and output layers...
     for i = 2:layerCount
-        net = b{i} + dot(w{i - 1}, a{i - 1});
-        a{i} = f(net);
+        n = layers(i);
+        net = zeros(1, n);
+        for j = 1:n
+            net(j) = b{i}(j) + dot(w{i}(j, :), o{i - 1});
+        end
+        o{i} = f(net);
     end
+    display(o);
 end
-
 
 mlp = struct('weights', w, 'bias', b, 'layers', layers, 'activationFn', activationFn);
 end
