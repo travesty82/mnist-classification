@@ -111,6 +111,8 @@ while true
         for i = (layerCount - 1):-1:2
             d{i} = df(o{i}) .* sum(sum(w{i + 1}, 2) .* d{i + 1}');
         end
+        % Update cumulative error
+        cumulativeError = cumulativeError + (1/2) .* sum(error .^ 2);
 
         % WEIGHT AND BIAS UPDATE
         % ======================
@@ -120,6 +122,8 @@ while true
             b{i} = b{i} + (learningRate * d{i});
         end
     end
+    
+    display(cumulativeError);
     
     % Keep training until the specified number of iterations or a specified
     % error threshold is reached.
