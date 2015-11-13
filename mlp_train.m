@@ -31,7 +31,7 @@ else
     assert(false, 'Invalid activation function.');
 end
 
-rng(40);
+rng(95);
 
 % Initialize the weights and biases to either zero or small random
 % values in the range [-0.25, 0.25] depending on whether the
@@ -62,8 +62,7 @@ for s = 1:length(xs)
     o{1} = x;
     % For hidden and output layers...
     for i = 2:layerCount
-        net = b{i} + dot(w{i}, repmat(o{i - 1}, layers(i), 1), 2)';
-        o{i} = f(net);
+        o{i} = f(b{i} + sum(w{i} * o{i - 1}'));
     end
     
     % BACK PROPAGATION
@@ -74,6 +73,14 @@ for s = 1:length(xs)
     d{end} = error .* df(o{end});
     for i = (layerCount - 1):-1:2
         d{i} = df(o{i}) .* sum(w{i + 1} * d{i + 1}');
+    end
+    
+    % WEIGHT AND BIAS UPDATE
+    % ======================
+    %
+    for i = 2:layerCount
+        w{i} = w{i} + (learningRate * d{i}' * o{i - 1});
+        b{i} = b{i} + (learningRate * d{i});
     end
 end
 
