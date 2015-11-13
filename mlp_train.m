@@ -1,11 +1,34 @@
 function mlp = mlp_train(hiddenLayers, xs, ts, learningRate, varargin)
+% MLP_TRAIN Trains a multi-layer perceptron.
+%   MPL = MPL_TRAIN(HIDDENLAYERS, XS, TS, LEARNINGRATE) Trains a
+%   multi-layer perceptron using inputs XS (specified row-wise), target
+%   outputs TS (specified row wise), at a rate of LEARNINGRATE.
+%   HIDDENLAYERS specifies the number of neurons in each hidden layer, e.g.
+%   [4 5] for 2 hidden layers with 4 neurons in the first hidden layer and
+%   5 neurons in the second hidden layer.
 %
-% REFERENCES
-%   * http://ml.informatik.uni-freiburg.de/_media/documents/teaching/ss09/ml/mlps.pdf
-%   * http://stackoverflow.com/questions/3775032/how-to-update-the-bias-in-neural-network-backpropagation
-%   * http://rolisz.ro/2013/04/18/neural-networks-in-python/
-%   * https://www.willamette.edu/~gorr/classes/cs449/backprop.html
-%   * http://sydney.edu.au/engineering/it/~comp4302/ann4-3s.pdf
+%   Options:
+%       ACTIVATIONFN - The activation function to use when determining
+%       neuron output. Must be one of 'logsig' or 'tansig'. Default value
+%       is 'logsig'
+%       NUMITER - The number of iterations (epochs) to train for.
+%       THRESHOLD - The cumulative error threshold. Training will continue
+%       until the cumulative error is less than or equal to this threshold.
+%       If both NUMITER and THRESHOLD are specified, training will stop
+%       when either one of the conditions are reached (whichever comes
+%       first)
+%       RANDOMIZE - If this is `true`, the initial weights and biases will
+%       be initialized randomly to small values in the range [-0.25, 0.25].
+%       If this is `false`, all weights and biases will be initialized to
+%       zero. Default value is `true`.
+%
+%   REFERENCES
+%       * http://ml.informatik.uni-freiburg.de/_media/documents/teaching/ss09/ml/mlps.pdf
+%       * http://stackoverflow.com/questions/3775032/how-to-update-the-bias-in-neural-network-backpropagation
+%       * http://rolisz.ro/2013/04/18/neural-networks-in-python/
+%       * https://www.willamette.edu/~gorr/classes/cs449/backprop.html
+%       * http://sydney.edu.au/engineering/it/~comp4302/ann4-3s.pdf
+%
 p = inputParser;
 addRequired(p, 'hiddenLayers');
 addRequired(p, 'x');
@@ -94,9 +117,7 @@ while true
     % Keep training until the specified number of iterations or a specified
     % error threshold is reached.
     iter = iter + 1;
-    if numIter > 0 && iter >= numIter
-        break
-    elseif cumulativeError <= threshold
+    if (numIter > 0 && iter >= numIter) || (cumulativeError <= threshold)
         break
     end
 end
