@@ -1,13 +1,13 @@
 function mlp = mlp_train(hiddenLayers, xs, ts, learningRate, varargin)
 % MLP_TRAIN Trains a multi-layer perceptron.
-%   MPL = MPL_TRAIN(HIDDENLAYERS, XS, TS, LEARNINGRATE) Trains a
+%   MLP = MLP_TRAIN(HIDDENLAYERS, XS, TS, LEARNINGRATE) Trains a
 %   multi-layer perceptron using inputs XS (specified row-wise), target
 %   outputs TS (specified row wise), at a rate of LEARNINGRATE.
 %   HIDDENLAYERS specifies the number of neurons in each hidden layer, e.g.
 %   [4 5] for 2 hidden layers with 4 neurons in the first hidden layer and
 %   5 neurons in the second hidden layer.
 %
-%   Options:
+%   OPTIONS
 %       ACTIVATIONFN - The activation function to use when determining
 %       neuron output. Must be one of 'logsig' or 'tansig'. Default value
 %       is 'logsig'
