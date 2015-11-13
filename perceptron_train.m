@@ -30,7 +30,7 @@ assert(isvector(t), 'Target must be a vector.');
 assert(count == length(t), 'Number of targets must be equivalent to number of inputs');
 
 if p.Results.randomize
-    w = rand(1, dim);
+    w = (rand(1, dim) * 0.5) - 0.25; % Random numbers in range [-0.25, 0.25]
 else
     w = zeros(1, dim);
 end
