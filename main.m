@@ -5,4 +5,5 @@ train_labels = loadMNISTLabels('mnist/train-labels-idx1-ubyte');
 
 x = [1 0 0; 1 0 1; 1 1 0; 1 1 1];
 t = [1 1 1 0];
-train_perceptron(x, t, 0.1, @unipolar_tfn)
+p = perceptron_train(x, t, 0.1, @unipolar_tfn);
+perceptron_predict(p, [1 0 0])

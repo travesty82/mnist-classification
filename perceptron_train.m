@@ -1,7 +1,7 @@
-function w = train_perceptron(x, t, learningRate, varargin)
+function perceptron = perceptron_train(x, t, learningRate, varargin)
 % TRAIN_PERCEPTRON Trains a perceptron.
-%   W = TRAIN_PERCEPTRON(X, T, LEARNINGRATE) Trains a perceptron with
-%   training patterns X and target outputs T at a rate of LEARNINGRATE.
+%   PERCEPTRON = TRAIN_PERCEPTRON(X, T, LEARNINGRATE) Trains a perceptron 
+%   with training patterns X and target outputs T at a rate of LEARNINGRATE.
 %   Training patterns are specified row-wise.
 %
 %   Other options:
@@ -68,4 +68,5 @@ while true
         break
     end
 end
+perceptron = struct('weights', w, 'transferFn', transferFn);
 end
