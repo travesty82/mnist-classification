@@ -55,8 +55,6 @@ else
     assert(false, 'Invalid activation function.');
 end
 
-rng(40);
-
 % Initialize the weights and biases to either zero or small random
 % values in the range [-0.25, 0.25] depending on whether the
 % `randomize` option is specified.
@@ -121,5 +119,9 @@ while true
         break
     end
 end
-mlp = struct('weights', w, 'bias', b, 'layers', layers, 'activationFn', activationFn);
+mlp = struct();
+mlp.weights = w;
+mlp.bias = b;
+mlp.layers = layers;
+mlp.activationFn = f;
 end
