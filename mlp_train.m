@@ -5,6 +5,7 @@ function mlp = mlp_train(hiddenLayers, xs, ts, learningRate, varargin)
 %   * http://stackoverflow.com/questions/3775032/how-to-update-the-bias-in-neural-network-backpropagation
 %   * http://rolisz.ro/2013/04/18/neural-networks-in-python/
 %   * https://www.willamette.edu/~gorr/classes/cs449/backprop.html
+%   * http://sydney.edu.au/engineering/it/~comp4302/ann4-3s.pdf
 p = inputParser;
 addRequired(p, 'hiddenLayers');
 addRequired(p, 'x');
@@ -30,6 +31,8 @@ else
     assert(false, 'Invalid activation function.');
 end
 
+rng(40);
+
 % Initialize the weights and biases to either zero or small random
 % values in the range [-0.25, 0.25] depending on whether the
 % `randomize` option is specified.
@@ -47,12 +50,12 @@ for i = 2:layerCount
 end
 
 % For each input vector.
-for k = 1:length(xs)
-    x = xs(k, :);
-    t = ts(k, :);
+for s = 1:length(xs)
+    x = xs(s, :);
+    t = ts(s, :);
     
-    % FEED FORWARD STEP
-    % ===================
+    % FEED FORWARD
+    % ============
     %
     o = cell(1, layerCount);
     % "Output" for input layer is just the input vector.
@@ -63,24 +66,14 @@ for k = 1:length(xs)
         o{i} = f(net);
     end
     
-    % BACK PROPAGATION STEP
-    % =====================
+    % BACK PROPAGATION
+    % ================
     %
     d = cell(1, layerCount);
     error = t - o{end};
     d{end} = error .* df(o{end});
     for i = (layerCount - 1):-1:2
-%         display(w{i});
-%         display(repmat(d{i + 1}, layers(i), 1));
-%         d{i} = dot(w{i}, repmat(d{i + 1}, layers(i), 1), 2)' .* df(o{i});
-        n = layers(i);
-        di = zeros(1, n);
-        for j = 1:n
-            display(w{i}(j, :));
-            display(d{i + 1});
-            di(j) = dot(w{i + 1}(j, :), d{i + 1});
-        end
-        d{i} = di .* df(o{i});
+        d{i} = df(o{i}) .* sum(w{i + 1} * d{i + 1}');
     end
 end
 
