@@ -60,27 +60,41 @@ end
 % values in the range [-0.25, 0.25] depending on whether the
 % `randomize` option is specified.
 genRandom = @(m, n) (rand(m, n) * 0.5) - 0.25;
-w = cell(1, layerCount);
-b = cell(1, layerCount);
+w = cell(1, layerCount - 1);
+b = cell(1, layerCount - 1);
 nabla_b = cell(1, layerCount - 1);
 nabla_w = cell(1, layerCount - 1);
 delta_nabla_b = cell(1, layerCount - 1);
 delta_nabla_w = cell(1, layerCount - 1);
+
+% hard coded for now
+% for testing Purposes
+w{1} = [ 1.23242468,  0.07782735;-1.63889442, -0.18770819];
+w{2} = [ 1.87682078, -0.43357367];
+
+b{1} = [-0.54916059,-0.51409505];
+b{2} = [-0.45511359];
+
+nabla_b{1} = b{1};
+nabla_b{2} = b{2};
+nabla_w{1} = w{1};
+nabla_w{2} = w{2};
+
 for i = 1:layerCount - 1
-    % b{i} is initialized to a vector such that there is one bias value
-    % per neuron in layer i. w{i} is initialized to a matrix such that
-    % value of w{i}(k, j) is the weight of the connection from neuron j to
-    % neuron k, where k is a neuron that exists in layer i.
-    if p.Results.randomize
-        w{i} = genRandom(layers(i), layers(i + 1));
-        b{i} = genRandom(1, layers(i));
-    else
-        w{i} = zeros(layers(i), layers(i + 1));
-        b{i} = zeros(1, layers(i));
-    end
-    % gradient cost descent
-    nabla_w{i} = zeros(layers(i), layers(i + 1));
-    nabla_b{i} = zeros(1, layers(i));
+%     % b{i} is initialized to a vector such that there is one bias value
+%     % per neuron in layer i. w{i} is initialized to a matrix such that
+%     % value of w{i}(k, j) is the weight of the connection from neuron j to
+%     % neuron k, where k is a neuron that exists in layer i.
+%     if p.Results.randomize
+%         w{i} = genRandom(layers(i), layers(i + 1));
+%         b{i} = genRandom(1, layers(i + 1));
+%     else
+%         w{i} = zeros(layers(i), layers(i + 1));
+%         b{i} = zeros(1, layers(i + 1));
+%     end
+%     % gradient cost descent
+    %nabla_w{i} = zeros(layers(i), layers(i + 1));
+    %nabla_b{i} = zeros(layers(i), layers(i + 1));
 end
 numIter = p.Results.numIter;
 threshold = p.Results.threshold;
@@ -101,7 +115,7 @@ while true
         o = cell(1, layerCount);
         zs = cell(1, layerCount);
         % "Output" for input layer is just the input vector.
-        o{1} = x';
+        o{1} = x;
         % For hidden and output layers...
         % w{1} is weight from 1 to 2
         % b{1} is bias from 1 to 2
@@ -115,15 +129,21 @@ while true
         % forward and back prop can be done in one loop
         
         for layer = 1:layerCount - 1
-            zs{layer} = b{layer} + rowDot(w{layer},o{layer})';
+            zs{layer} = rowDotBias(w{layer},o{layer},b{layer})';
             o{layer + 1} = f(zs{layer});
             
             % zero out delta while we are at it
             delta_nabla_w{layer} = zeros(layers(layer), layers(layer + 1));
             delta_nabla_b{layer} = zeros(1, layers(layer));
         end
+        
+        
+        % Delta : [[-0.11873656 -0.12445381]]
+        % First Round
         delta = (o{end} - t) .* df(zs{end - 1});
-        delta_nabla_w{end} = dot(delta,o{end - 2});
+        
+        % [[-0.08591491 -0.08786517]]
+        delta_nabla_w{end} = rowDotBias(delta,o{end - 1}',0);
         delta_nabla_b{end} = delta;
         
         % BACK PROPAGATION: Calculate deltas
@@ -135,11 +155,16 @@ while true
         for layer = (layerCount - 2):-1:1
             z = zs{layer};
             sp = df(z);
-            delta = rowDot(w{layer + 1},delta)' .* sp;
+
+            delta = ((delta * w{layer + 1})' .* sp)';
             delta_nabla_b{layer} = delta;
-            delta_nabla_w{layer} = dot(o{layer},delta)';
+            
+            %activations[-l-1] [0 1]
+            %nabla_w : [array([-0.05113351,  0.01195634]), array([[-0.08591491, -0.08786517]])]
+            temp = rowDotBias(o{layer},delta,0)';
+            delta_nabla_w{layer} = padarray(temp,size(delta_nabla_w{layer}) - size(temp),'post');
         end
-        
+   
         % Update cumulative error
         cumulativeError = cumulativeError + (1/2 * length(xs)) * sum(delta .^ 2);
         disp(cumulativeError);
@@ -148,11 +173,13 @@ while true
         % ======================
         
         for layer = 1:layerCount-1
-            nabla_w{layer} = nabla_w{layer} + delta_nabla_w{layer};
-            nabla_b{layer} = nabla_b{layer} + delta_nabla_b{layer};
+            % TODO: Update as needed 
+            % this doesn't work correctly
+            %nabla_w{layer} = nabla_w{layer} + delta_nabla_w{layer};
+            %nabla_b{layer} = nabla_b{layer} + delta_nabla_b{layer};
             
-            w{layer} = w{layer} - ((learningRate/length(xs)) * nabla_w{layer});
-            b{layer} = b{layer} - ((learningRate/length(xs)) * nabla_b{layer});
+            %w{layer} = w{layer} - ((learningRate/length(xs)) .* nabla_w{layer});
+            %b{layer} = b{layer} - ((learningRate/length(xs)) .* nabla_b{layer});
         end
         
     end
