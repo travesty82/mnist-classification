@@ -75,10 +75,6 @@ w{2} = [ 1.87682078, -0.43357367];
 b{1} = [-0.54916059,-0.51409505];
 b{2} = [-0.45511359];
 
-nabla_b{1} = b{1};
-nabla_b{2} = b{2};
-nabla_w{1} = w{1};
-nabla_w{2} = w{2};
 
 for i = 1:layerCount - 1
 %     % b{i} is initialized to a vector such that there is one bias value
@@ -93,8 +89,8 @@ for i = 1:layerCount - 1
 %         b{i} = zeros(1, layers(i + 1));
 %     end
 %     % gradient cost descent
-    %nabla_w{i} = zeros(layers(i), layers(i + 1));
-    %nabla_b{i} = zeros(layers(i), layers(i + 1));
+    nabla_w{i} = zeros(layers(i), layers(i + 1));
+    nabla_b{i} = zeros(layers(i), layers(i + 1));
 end
 numIter = p.Results.numIter;
 threshold = p.Results.threshold;
@@ -161,8 +157,7 @@ while true
             
             %activations[-l-1] [0 1]
             %nabla_w : [array([-0.05113351,  0.01195634]), array([[-0.08591491, -0.08786517]])]
-            temp = rowDotBias(o{layer},delta,0)';
-            delta_nabla_w{layer} = padarray(temp,size(delta_nabla_w{layer}) - size(temp),'post');
+            delta_nabla_w{layer} = rowDotBias(o{layer},delta,0)';
         end
    
         % Update cumulative error
@@ -173,15 +168,20 @@ while true
         % ======================
         
         for layer = 1:layerCount-1
-            % TODO: Update as needed 
-            % this doesn't work correctly
-            %nabla_w{layer} = nabla_w{layer} + delta_nabla_w{layer};
-            %nabla_b{layer} = nabla_b{layer} + delta_nabla_b{layer};
+            % This may be working. Might be transposed.
+            nabla_w{layer} = operatorMatrix(nabla_w{layer},delta_nabla_w{layer},@plus);
+            nabla_b{layer} = operatorMatrix(nabla_b{layer},delta_nabla_b{layer},@plus);
             
             %w{layer} = w{layer} - ((learningRate/length(xs)) .* nabla_w{layer});
             %b{layer} = b{layer} - ((learningRate/length(xs)) .* nabla_b{layer});
         end
         
+    end
+    
+    
+    for layer = 1:layerCount-1 
+            w{layer} = operatorMatrix(w{layer},((learningRate/length(xs)) .* nabla_w{layer}),@minus);
+            b{layer} = operatorMatrix(b{layer},((learningRate/length(xs)) .* nabla_b{layer}),@minus);
     end
     
     % Keep training until the specified number of iterations or a specified
