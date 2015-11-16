@@ -28,6 +28,7 @@ function mlp = mlp_train(hiddenLayers, xs, ts, learningRate, varargin)
 %       * http://rolisz.ro/2013/04/18/neural-networks-in-python/
 %       * https://www.willamette.edu/~gorr/classes/cs449/backprop.html
 %       * http://sydney.edu.au/engineering/it/~comp4302/ann4-3s.pdf
+%       * https://github.com/mnielsen/neural-networks-and-deep-learning/blob/master/src/network.py
 %
 p = inputParser;
 addRequired(p, 'hiddenLayers');
@@ -61,20 +62,26 @@ end
 genRandom = @(m, n) (rand(m, n) * 0.5) - 0.25;
 w = cell(1, layerCount);
 b = cell(1, layerCount);
-for i = 2:layerCount
+nabla_b = cell(1, layerCount - 1);
+nabla_w = cell(1, layerCount - 1);
+delta_nabla_b = cell(1, layerCount - 1);
+delta_nabla_w = cell(1, layerCount - 1);
+for i = 1:layerCount - 1
     % b{i} is initialized to a vector such that there is one bias value
     % per neuron in layer i. w{i} is initialized to a matrix such that
     % value of w{i}(k, j) is the weight of the connection from neuron j to
     % neuron k, where k is a neuron that exists in layer i.
     if p.Results.randomize
-        w{i} = genRandom(layers(i), layers(i - 1));
+        w{i} = genRandom(layers(i), layers(i + 1));
         b{i} = genRandom(1, layers(i));
     else
-        w{i} = zeros(layers(i), layers(i - 1));
+        w{i} = zeros(layers(i), layers(i + 1));
         b{i} = zeros(1, layers(i));
     end
+    % gradient cost descent
+    nabla_w{i} = zeros(layers(i), layers(i + 1));
+    nabla_b{i} = zeros(1, layers(i));
 end
-
 numIter = p.Results.numIter;
 threshold = p.Results.threshold;
 iter = 0;
@@ -92,43 +99,68 @@ while true
         % neuron of each layer. o{i} is the vector containing the output
         % values for all neurons on layer i.
         o = cell(1, layerCount);
+        zs = cell(1, layerCount);
         % "Output" for input layer is just the input vector.
-        o{1} = x;
+        o{1} = x';
         % For hidden and output layers...
-        for i = 2:layerCount
-            o{i} = f(b{i} + sum(w{i} * o{i - 1}'));
-        end
+        % w{1} is weight from 1 to 2
+        % b{1} is bias from 1 to 2
+        % hence update layer i + 1 with values from i.
+        
+        % Extra Back Prop
+        % gradient for the cost function
+ 
 
+        
+        % forward and back prop can be done in one loop
+        
+        for layer = 1:layerCount - 1
+            zs{layer} = b{layer} + rowDot(w{layer},o{layer})';
+            o{layer + 1} = f(zs{layer});
+            
+            % zero out delta while we are at it
+            delta_nabla_w{layer} = zeros(layers(layer), layers(layer + 1));
+            delta_nabla_b{layer} = zeros(1, layers(layer));
+        end
+        delta = (o{end} - t) .* df(zs{end - 1});
+        delta_nabla_w{end} = dot(delta,o{end - 2});
+        delta_nabla_b{end} = delta;
+        
         % BACK PROPAGATION: Calculate deltas
         % ================
         %
-        % Like o, d contains deltas for each neuron of each layer.
-        d = cell(1, layerCount);
-        % Calculate delta for output layer
-        error = t - o{end};
-        d{end} = error .* df(o{end});
         % Calculate delta for hidden layers
-        for i = (layerCount - 1):-1:2
-            d{i} = df(o{i}) .* sum(sum(w{i + 1}, 2) .* d{i + 1}');
+        % Start at the 2nd last layer to 2nd layer
+        % reverse direction
+        for layer = (layerCount - 2):-1:1
+            z = zs{layer};
+            sp = df(z);
+            delta = rowDot(w{layer + 1},delta)' .* sp;
+            delta_nabla_b{layer} = delta;
+            delta_nabla_w{layer} = dot(o{layer},delta)';
         end
+        
         % Update cumulative error
-        cumulativeError = cumulativeError + (1/2) .* sum(error .^ 2);
+        cumulativeError = cumulativeError + (1/2 * length(xs)) * sum(delta .^ 2);
+        disp(cumulativeError);
 
         % WEIGHT AND BIAS UPDATE
         % ======================
-        %
-        for i = 2:layerCount
-            w{i} = w{i} + (learningRate * d{i}' * o{i - 1});
-            b{i} = b{i} + (learningRate * d{i});
+        
+        for layer = 1:layerCount-1
+            nabla_w{layer} = nabla_w{layer} + delta_nabla_w{layer};
+            nabla_b{layer} = nabla_b{layer} + delta_nabla_b{layer};
+            
+            w{layer} = w{layer} - ((learningRate/length(xs)) * nabla_w{layer});
+            b{layer} = b{layer} - ((learningRate/length(xs)) * nabla_b{layer});
         end
+        
     end
-    
-    display(cumulativeError);
     
     % Keep training until the specified number of iterations or a specified
     % error threshold is reached.
     iter = iter + 1;
-    if (numIter > 0 && iter >= numIter) || (cumulativeError <= threshold)
+    if (numIter > 0 && iter >= numIter )%  || (cumulativeError <= threshold)
         break
     end
 end
