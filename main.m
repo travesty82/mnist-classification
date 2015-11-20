@@ -15,7 +15,7 @@ n = size(x, 1);
 hiddenNeurons = 4;
 learningRate = 0.75;
 momentum = 0.001;
-numIter = 4000;
+numIter = 1000;
 
 [mlp, mse] = mlp_train([hiddenNeurons], x, t, learningRate, numIter, 'logsig', 'momentum', alpha);
 y = zeros(1, n);
