@@ -18,6 +18,7 @@ function features = cnnConvolve(images, w, b, activationFn)
 %       features, where convDim = imageDim - filterDim + 1.
 %   
 %   REFERENCES
+%       * http://ufldl.stanford.edu/tutorial/supervised/FeatureExtractionUsingConvolution/
 %       * http://ufldl.stanford.edu/tutorial/supervised/ExerciseConvolutionAndPooling/
 
 filterDim = size(w, 1);

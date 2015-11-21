@@ -13,6 +13,10 @@ function features = cnnPool(poolDim, convolvedFeatures)
 %   OUTPUTS
 %       FEATURES - Pooled features with dimensions (convDim / poolDim x 
 %       convDim / poolDim x filterNum x imageNum)
+%
+%   REFERENCES
+%       * http://ufldl.stanford.edu/tutorial/supervised/Pooling/
+%       * http://ufldl.stanford.edu/tutorial/supervised/ExerciseConvolutionAndPooling/
 %       
 numImages = size(convolvedFeatures, 4);
 numFilters = size(convolvedFeatures, 3);
