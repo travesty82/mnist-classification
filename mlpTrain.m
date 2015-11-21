@@ -48,16 +48,7 @@ assert(size(xs, 1) == size(ts, 1), 'Number of input vectors and number of target
 
 layers = [size(xs, 2) hiddenLayers size(ts, 2)];
 layerCount = length(layers);
-activationFn = p.Results.activationFn;
-if strcmp(activationFn, 'logsig')
-    f = @logsig;
-    df = @(x) dlogsig(x, logsig(x));
-elseif strcmp(activationFn, 'tansig')
-    f = @tansig;
-    df = @(x) dtansig(x, tansig(x));
-else
-    assert(false, 'Invalid activation function.');
-end
+[f, df] = getActivationFn(p.Results.activationFn);
 
 % Initialize the weights and biases to either zero or small random
 % values in the range [-0.25, 0.25] depending on whether the
