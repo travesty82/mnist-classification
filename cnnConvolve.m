@@ -1,6 +1,6 @@
 function features = cnnConvolve(images, w, b, activationFn)
 % CNNCONVOLVE - Returns features obtained by convolving filters represented
-% by learnied weights & bias with images.
+% by learned weights & bias with images.
 %
 %   FEATURES = CNNCONVOLVE(IMAGES, W, B, ACTIVATIONFN)
 %
@@ -38,10 +38,10 @@ features = zeros(convDim, convDim, numImages, numFeatures);
 
 for imageNum = 1:numImages
     for filterNum = 1:numFilters
-        filter = w(:, :, filterNum);
-        filter = rot90(filter, 2);
+        feature = w(:, :, filterNum);
+        feature = rot90(feature, 2);
         image = images(:, :, imageNum);
-        convolvedImage = conv2(image, filter, 'valid');
+        convolvedImage = conv2(image, feature, 'valid');
         features(:, :, filterNum, imageNum) = f(convolvedImage + b(filterNum));
     end
 end
