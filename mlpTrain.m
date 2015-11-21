@@ -1,6 +1,6 @@
-function [mlp, mse] = mlp_train(hiddenLayers, xs, ts, learningRate, numIter, varargin)
-% MLP_TRAIN Trains a multi-layer perceptron.
-%   [MLP. MSE] = MLP_TRAIN(HIDDENLAYERS, XS, TS, LEARNINGRATE, NUMITER) 
+function [mlp, mse] = mlpTrain(hiddenLayers, xs, ts, learningRate, numIter, varargin)
+% MLPTRAIN Trains a multi-layer perceptron.
+%   [MLP. MSE] = MLPTRAIN(HIDDENLAYERS, XS, TS, LEARNINGRATE, NUMITER) 
 %   Trains a multi-layer perceptron using inputs XS (specified row-wise),
 %   target outputs TS (specified row wise), at a rate of LEARNINGRATE.
 %   HIDDENLAYERS specifies the number of neurons in each hidden layer, e.g.

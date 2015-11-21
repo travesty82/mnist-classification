@@ -1,4 +1,4 @@
-function y = mlp_predict(mlp, x)
+function y = mlpPredict(mlp, x)
 % MLP_PREDICT Predicts the output of a trained multi-layer perceptron for a
 % given input vector.
 %
