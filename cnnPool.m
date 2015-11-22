@@ -22,15 +22,18 @@ numImages = size(convolvedFeatures, 4);
 numFilters = size(convolvedFeatures, 3);
 convolvedDim = size(convolvedFeatures, 1);
 
-filterDim = convolvedDim / poolDim;
-features = zeros(filterDim, filterDim, numFilters, numImages);
-meanFilter = ones(filterDim) / (filterDim * filterDim);
+featureDim = convolvedDim / poolDim;
+features = zeros(featureDim, featureDim, numFilters, numImages);
+meanFilter = ones(poolDim) / (poolDim * poolDim);
+% From MATLAB conv2() docs, for 'valid' option:
+% size(C) = max([ma-max(0,mb-1),na-max(0,nb-1)],0)
+featureIdx = 1:poolDim:(convolvedDim - max(0, poolDim - 1));
 
 for imageNum = 1:numImages
     for filterNum = 1:numFilters
         feature = convolvedFeatures(:, :, filterNum, imageNum);
-        averagedFeature = conv2(feature, meanFilter, 'valid');
-        features(:, :, filterNum, imageNum) = averagedFeature;
+        meanFeature = conv2(feature, meanFilter, 'valid');
+        features(:, :, filterNum, imageNum) = meanFeature(featureIdx, featureIdx);
     end
 end
 end
