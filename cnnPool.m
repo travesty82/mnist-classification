@@ -8,11 +8,11 @@ function features = cnnPool(poolDim, convolvedFeatures)
 %       arithmetic mean filter to convolve with)
 %       CONVOLVEDFEATURES - Convolved features obtained using a call to the
 %       CNNCONVOLVE function, with dimensions (convDim x convDim x
-%       filterNum x imageNum)
+%       numFilters x numImages)
 %
 %   OUTPUTS
 %       FEATURES - Pooled features with dimensions (convDim / poolDim x 
-%       convDim / poolDim x filterNum x imageNum)
+%       convDim / poolDim x numFilters x numImages)
 %
 %   REFERENCES
 %       * http://ufldl.stanford.edu/tutorial/supervised/Pooling/

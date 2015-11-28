@@ -12,5 +12,5 @@ function [w, b] = cnnConvolveInit(numFeatures, filterDim)
 %       W - (filterDim x filterDim x numFeatures) matrix of random weights.
 %       B - (numFeatures x 1) vector of random biases.
 w = rand(filterDim, filterDim, numFeatures);
-b = rand(numFeatures, 1);
+b = -ones(numFeatures, 1);
 end

@@ -35,7 +35,7 @@ assert(ndims(images) == 3, 'Images can only have a single channel');
 convDim = imageDim - filterDim + 1;
 numImages = size(images, 3);
 f = getActivationFn(activationFn);
-features = zeros(convDim, convDim, numImages, numFilters);
+features = zeros(convDim, convDim, numFilters, numImages);
 
 for imageNum = 1:numImages
     for filterNum = 1:numFilters

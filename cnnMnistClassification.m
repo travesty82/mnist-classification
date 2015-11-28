@@ -1,6 +1,6 @@
 addpath('third-party/mnistHelper');
 
-numSamples = 100;
+numSamples = 2;
 
 train_images = loadMNISTImages('mnist/train-images-idx3-ubyte');
 train_labels = loadMNISTLabels('mnist/train-labels-idx1-ubyte');
@@ -72,7 +72,7 @@ l23Map = [1 0 0 0 1 1 1 0 0 1 1 1 1 0 1 1; ...
 [w1, b1] = cnnConvolveInit(l1Features, l1FilterDim);
 [w3, b3] = cnnConvolveInit(l3Features, l3FilterDim);
 [w5, b5] = cnnConvolveInit(l5Features, l5FilterDim);
-    
+
 for i = 1:nEpochs
     % ==============
     % FEED FORWARD
@@ -80,7 +80,9 @@ for i = 1:nEpochs
     
     l1Features = cnnConvolve(train_images, w1, b1, activationFn);
     l2Features = cnnPool(l2PoolDim, l1Features);
+    l2Features = mean(l2Features, 4);
     l3Features = cnnConvolve(l2Features, w3, b3, activationFn);
     l4Features = cnnPool(l4PoolDim, l3Features);
+    l4Features = mean(l4Features, 4);
     l5Features = cnnConvolve(l4Features, w5, b5, activationFn);
 end
