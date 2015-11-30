@@ -1,23 +1,4 @@
-function [images, labels, net] = cnnMNISTInit(dataDir, isTraining)
-    % ########################
-    % DATA LOADING
-    % ########################
-    
-    if isTraining
-        images = loadMNISTImages(fullfile(dataDir, 'train-images-idx3-ubyte'));
-        labels = loadMNISTLabels(fullfile(dataDir, 'train-labels-idx1-ubyte'))';
-    else
-        images = loadMNISTImages(fullfile(dataDir, 't10k-images-idx3-ubyte'));
-        labels = loadMNISTLabels(fullfile(dataDir, 't10k-labels-idx1-ubyte'))';
-    end
-    
-    imageDim = size(images, 1);
-    images = single(reshape(images, imageDim, imageDim, 1, []));
-    
-    % ########################
-    % NETWORK CONFIGURATION
-    % ########################
-    
+function net = cnnMNISTInit()
     % Scaling factor for randomly generated values
     f = 1 / 100;
     
@@ -53,17 +34,15 @@ function [images, labels, net] = cnnMNISTInit(dataDir, isTraining)
                                  'stride', 2, ...
                                  'pad', 0);
     
-    % Layer 7: Fully Connected Layer, 7x7 kernel, 10 outputs
+    % Layer 7: Fully Connected Layer, 4x4 kernel, 10 outputs
     net.layers{end + 1} = struct('type', 'conv', ...
-                                 'weights', {{f * randn(1, 1, 64, 10, 'single'), zeros(1, 10, 'single')}}, ...
+                                 'weights', {{f * randn(4, 4, 64, 10, 'single'), zeros(1, 10, 'single')}}, ...
                                  'stride', 1, ...
                                  'pad', 0);
                              
     % Layer 8: Dropout (only if training)
-    if isTraining
-        net.layers{end + 1} = struct('type', 'dropout', 'rate', 0.5);
-    end
+    net.layers{end + 1} = struct('type', 'dropout', 'rate', 0.5);
     
     % Layer 9: Softmax
-    net.layers{end + 1} = struct('type', 'softmax');
+    net.layers{end + 1} = struct('type', 'softmaxloss');
 end
