@@ -3,7 +3,6 @@ function net = cnnMNISTSGD(images, labels, getBatch, varargin)
     % CONFIGURATION PARAMETERS
     % ########################
     
-    opts.dataDir = 'mnist';
     opts.batchSize = 32; % Batch size must be divisible by 32.
     opts.numEpochs = 20;
     opts.learningRate = 0.01;

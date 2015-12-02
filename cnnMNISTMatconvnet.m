@@ -33,7 +33,7 @@ trainImages = single(cropImageBatchRandom(trainImages, cx, cy));
 % ########################
 
 batchSize = 32;
-%net = cnnMNISTSGD(trainImages, trainLabels, @getBatch, 'batchSize', batchSize);
+net = cnnMNISTAdam(trainImages, trainLabels, @getBatch, 'batchSize', batchSize);
 
 % ########################
 % PREDICTION
