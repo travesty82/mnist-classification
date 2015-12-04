@@ -7,7 +7,7 @@ function net = cnnMNISTSGD(images, labels, getBatch, varargin)
     opts.numEpochs = 20;
     opts.learningRate = 0.01;
     opts.weightDecay = 0.001;
-    opts.momentum = [0.5,0.85:(0.92-0.85)/opts.numEpochs:0.92];
+    opts.momentum = [0.5,0.85:(0.92-0.85)/opts.numEpochs-2:0.92];
     opts.net = cnnMNISTInit();
     opts = vl_argparse(opts, varargin);
     

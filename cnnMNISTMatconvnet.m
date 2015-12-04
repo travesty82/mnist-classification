@@ -38,17 +38,18 @@ fprintf('Starting Test\n');
 fprintf('%20s %20s %20s %20s %20s\n','Network','Batch Size','Epochs','Learning Rate','Accuracy');
 fprintf('------------------------------------------------------------------------------------------------------------------------------\n');
 
-for netMatFile=dir('testnet/*.mat')
-    netIn = load(strcat('testnet/',netMatFile),'net').net;
+for netMatFile=dir('testnet/*.mat')'
+    netIn = load(strcat('testnet/',netMatFile.name),'net');
+    netIn = netIn.net;
     for batchSize=[32,64,128,256,512,1028]
         for epochs=[10,20,30,40,50]
             for learningRate=[0.0001,0.001,0.01,0.1]
-                for momentum=[[0.5,repmat(0.9,epochs - 1,1)],...
-                        [0.5,0.9:(0.95-0.9)/(epochs-1):0.95],...
-                        [0.5,0.9:(0.92-0.9)/(epochs-1):0.92],...
-                        repmat(0.9,epochs,1)];
+                for momentum=[[0.5,repmat(0.9,epochs - 1,1)'];...
+                        [0.5,0.9:(0.95-0.9)/(epochs-2):0.95];...
+                        [0.5,0.9:(0.92-0.9)/(epochs-2):0.92];...
+                        repmat(0.9,epochs,1)'];
                     net = cnnMNISTSGD(trainImages, trainLabels, @getBatch, 'batchSize', batchSize,...
-                        'momentum', momentum, 'epochs',epochs, 'net', netIn, 'learningRate',learningRate);
+                        'momentum', momentum, 'numEpochs',epochs, 'net', netIn, 'learningRate',learningRate);
                     
                     % ########################
                     % PREDICTION
