@@ -14,13 +14,14 @@ function net = cnnMNISTAdam(images, labels, getBatch, varargin)
     opts.momentum1 = 0.9;
     opts.momentum2 = 0.999;
     opts.epsilon = 1e-8;
+    opts.net = cnnMNISTInit();
     opts = vl_argparse(opts, varargin);
     
     % ########################
     % INITIALIZATION
     % ########################
     
-    net = cnnMNISTInit();
+    net = opts.net;
     numBatches = ceil(size(labels, 2) / opts.batchSize);
     
     % ########################

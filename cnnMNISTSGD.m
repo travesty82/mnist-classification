@@ -7,14 +7,15 @@ function net = cnnMNISTSGD(images, labels, getBatch, varargin)
     opts.numEpochs = 20;
     opts.learningRate = 0.01;
     opts.weightDecay = 0.001;
-    opts.momentum = 0.9;
+    opts.momentum = [0.5,0.85:(0.92-0.85)/opts.numEpochs:0.92];
+    opts.net = cnnMNISTInit();
     opts = vl_argparse(opts, varargin);
     
     % ########################
     % INITIALIZATION
     % ########################
     
-    net = cnnMNISTInit();
+    net = opts.net;
     numBatches = ceil(size(labels, 2) / opts.batchSize);
     
     % ########################
@@ -36,7 +37,7 @@ function net = cnnMNISTSGD(images, labels, getBatch, varargin)
         for b = 1:numBatches
             [imb, lb] = getBatch(images, labels, opts.batchSize, b);
             net.layers{end}.class = lb;
-            res = vl_simplenn(net, imb, single(1), res);
+            res = vl_simplenn(net, imb, double(1), res);
             fprintf('Batch %d/%d (epoch %d/%d)\n', b, numBatches, e, opts.numEpochs);
             
             for l = numel(net.layers):-1:1
@@ -45,7 +46,7 @@ function net = cnnMNISTSGD(images, labels, getBatch, varargin)
                 end
                 for j = 1:numel(res(l).dzdw)
                     net.layers{l}.momentum{j} = ...
-                        opts.momentum * net.layers{l}.momentum{j} ...
+                        opts.momentum(e) * net.layers{l}.momentum{j} ...
                         - opts.weightDecay * net.layers{l}.weights{j} ...
                         - (1 / opts.batchSize) * res(l).dzdw{j};
                     net.layers{l}.weights{j} = net.layers{l}.weights{j} ...
