@@ -65,8 +65,7 @@ for netMatFile=dir('testnet/*.mat')'
                     predictions = predictWithRandomCrop(net, testImages, testLabels, 10, cx, cy, 4);
                     acc = sum(predictions == testLabels) / numel(testLabels);
                     
-                    
-                    fprintf('%20s %20d %20d %20d %20s %20.2f%%\n',netIn,batchSize,epochs,learningRate, acc * 100);
+                    fprintf('%20s %20d %20d %20d %20s %20.2f%%\n',netMatFile.name,batchSize,epochs,learningRate, acc * 100);
                     fprintf('Momentum: '); disp(momentum);
                     fprintf('\n\n');
                     

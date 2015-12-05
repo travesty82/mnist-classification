@@ -38,7 +38,7 @@ function net = cnnMNISTSGD(images, labels, getBatch, varargin)
             [imb, lb] = getBatch(images, labels, opts.batchSize, b);
             net.layers{end}.class = lb;
             res = vl_simplenn(net, imb, double(1), res);
-%            fprintf('Batch %d/%d (epoch %d/%d)\n', b, numBatches, e, opts.numEpochs);
+            fprintf('Batch %d/%d (epoch %d/%d)\n', b, numBatches, e, opts.numEpochs);
             
             for l = numel(net.layers):-1:1
                 if ~isfield(net.layers{l}, 'weights') 
