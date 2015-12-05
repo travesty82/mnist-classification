@@ -11,14 +11,37 @@ function net = cnnMNISTSGD(images, labels, getBatch, varargin)
     opts.netID = 1;
     opts.useBnorm = false;
     opts.useCropping = false;
+    opts.gpus = [] ; % which GPU devices to use (none, one, or more)
     opts = vl_argparse(opts, varargin);
+    % setup GPUs
+    numGpus = numel(opts.gpus) ;
+    if numGpus > 1
+      if isempty(gcp('nocreate')),
+        parpool('local',numGpus) ;
+        spmd, gpuDevice(opts.gpus(labindex)), end
+      end
+    elseif numGpus == 1
+      gpuDevice(opts.gpus)
+    end
     
     % ########################
     % INITIALIZATION
     % ########################
     
-    net = cnnMNISTInit(opts.netID, opts);
+    net_cpu = cnnMNISTInit(opts.netID, opts);
     numBatches = ceil(size(labels, 2) / opts.batchSize);
+
+   % move CNN to GPU as needed
+   numGpus = numel(opts.gpus) ;
+   if numGpus >= 1
+      fprintf('Using GPU for NN\n');
+      images = gpuArray(images);
+      labels = gpuArray(labels);
+      net = vl_simplenn_move(net_cpu, 'gpu') ;
+   else
+      net = net_cpu ;
+      net_cpu = [] ;
+   end
     
     % ########################
     % TRAINING

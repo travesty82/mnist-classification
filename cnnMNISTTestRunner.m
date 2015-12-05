@@ -41,6 +41,9 @@ useCropping = [0, 1];
 learningRate = [0.001, 0.01, 0.1];
 netID = [1, 2, 3];
 method = [1, 2];
+gpu = [1];
+
+
 
 results = zeros(1, 6);
 for nid = netID
@@ -60,14 +63,15 @@ for nid = netID
                     else
                         images = trainImages;
                     end
+
                     if m == 1
                         net = cnnMNISTSGD(images, trainLabels, @getBatch, ...
                             'batchSize', bs, 'learningRate', lr, ...
-                            'useCropping', cr, 'useBnorm', bn, 'netID', nid);
+                            'useCropping', cr, 'useBnorm', bn, 'netID', nid,'gpus',gpu);
                     else
                         net = cnnMNISTAdam(images, trainLabels, @getBatch, ...
                             'batchSize', bs, 'learningRate', lr, ...
-                            'useCropping', cr, 'useBnorm', bn, 'netID', nid);
+                            'useCropping', cr, 'useBnorm', bn, 'netID', nid,'gpus',gpu);
                     end
                     if cr
                         predictions = predictWithRandomCrop(net, testImages, testLabels, 10, cx, cy, 4);
