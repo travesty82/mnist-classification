@@ -92,4 +92,10 @@ function net = cnnMNISTAdam(images, labels, getBatch, varargin)
             end
         end
     end
+
+   numGpus = numel(opts.gpus) ;
+   if numGpus >= 1
+      % Move back to cpu
+      net = vl_simplenn_move(net, 'cpu') ;
+   end
 end
