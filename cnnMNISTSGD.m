@@ -3,18 +3,21 @@ function net = cnnMNISTSGD(images, labels, getBatch, varargin)
     % CONFIGURATION PARAMETERS
     % ########################
     
-    opts.batchSize = 32; % Batch size must be divisible by 32.
+    opts.batchSize = 32;
     opts.numEpochs = 20;
     opts.learningRate = 0.01;
     opts.weightDecay = 0.001;
     opts.momentum = 0.9;
+    opts.netID = 1;
+    opts.useBnorm = false;
+    opts.useCropping = false;
     opts = vl_argparse(opts, varargin);
     
     % ########################
     % INITIALIZATION
     % ########################
     
-    net = cnnMNISTInit();
+    net = cnnMNISTInit(opts.netID, opts);
     numBatches = ceil(size(labels, 2) / opts.batchSize);
     
     % ########################

@@ -3,7 +3,7 @@ predictions = zeros(n, numClasses, size(labels, 2));
 net.layers{end}.class = labels;
 for i = 1:n
     croppedImages = single(cropImageBatchRandom(images, cx, cy));
-    res = vl_simplenn(net, croppedImages);
+    res = vl_simplenn(net, croppedImages, [], [], 'disableDropout', true);
     predictions(i, :, :) = squeeze(res(end - 1).x);
 end
 predictions = mean(predictions, 1);
