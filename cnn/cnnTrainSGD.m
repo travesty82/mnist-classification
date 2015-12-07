@@ -27,7 +27,7 @@ function net = cnnTrainSGD(images, labels, getBatch, varargin)
     % ########################
     
     opts.batchSize = 32;
-    opts.numEpochs = 1;
+    opts.numEpochs = 20;
     opts.learningRate = 0.01;
     opts.weightDecay = 0.001;
     opts.momentum = 0.9;

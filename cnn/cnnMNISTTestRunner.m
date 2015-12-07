@@ -24,7 +24,7 @@ testLabels = loadMNISTLabels(fullfile(dataDir, 't10k-labels-idx1-ubyte'));
 % ########################
 
 processLabels = @(l) l' + 1;
-processImages = @(im) reshape(im, size(im, 1), size(im, 2), 1, []);
+processImages = @(im) reshape(im, 28, 28, 1, []);
 
 trainImages = processImages(trainImages);
 trainLabels = processLabels(trainLabels);
@@ -41,8 +41,8 @@ croppedTrainImages = single(cropImageBatchRandom(trainImages, cx, cy));
 % TRAINING
 % ########################
 
-useBnorm = [1];
-useCropping = [1];
+useBnorm = [0, 1];
+useCropping = [0, 1];
 learningRate = [0.001, 0.01, 0.1];
 netID = [1, 2, 3];
 method = [1, 2];
