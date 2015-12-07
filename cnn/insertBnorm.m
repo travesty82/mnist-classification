@@ -1,6 +1,15 @@
-% --------------------------------------------------------------------
 function net = insertBnorm(net, l)
-% --------------------------------------------------------------------
+% INSERTBNORM - Inserts a batch normalization layer into a CNN. Copied from
+% matconvnet/examples/cnn_mnist_init.m
+%
+% INPUTS
+%   net - The CNN to insert the layer into
+%   l - The index of the convolution layer after which to insert the 
+%   normalization layer.
+%
+% OUTPUTS
+%   net - The net with the batch normalization layer inserted.
+% 
 assert(isfield(net.layers{l}, 'weights'));
 ndim = size(net.layers{l}.weights{1}, 4);
 layer = struct('type', 'bnorm', ...

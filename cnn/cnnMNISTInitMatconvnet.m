@@ -1,5 +1,17 @@
 function net = cnnMNISTInitMatconvnet(opts)
-% http://yann.lecun.com/exdb/publis/pdf/lecun-98.pdf
+% CNNMNISTINITMATCONVNET - Initializes a CNN based on the CNN included in the
+% MatConvNet examples for MNIST training
+% (matconvnet/examples/cnn_mnist_init.m)
+%
+% INPUTS
+%   opts - Configuration options
+%       opts.useCropping - Whether data was preprocessed by randomly
+%       cropping windows (data augmentation)
+%       opts.useBnorm - Whether to insert batch normalization layers after
+%       convolution layers
+% OUTPUTS
+%   net - Initialized CNN
+%
 opts.f = 1/100;
 
 % Layer 1: Convolution Layer, 5x5 kernel, 20 features

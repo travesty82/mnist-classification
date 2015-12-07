@@ -1,7 +1,11 @@
-addpath('third-party/mnistHelper');
-addpath('matconvnet/matlab');
-run('matconvnet/matlab/vl_setupnn.m');
-dataDir = 'mnist';
+% Test runner for classification of MNIST using CNNs
+% matconvnet must be in ../matconvnet
+% mnist data must be in ../mnist
+
+addpath('../third-party/mnistHelper');
+addpath('../matconvnet/matlab');
+run('../matconvnet/matlab/vl_setupnn.m');
+dataDir = '../mnist';
 
 rng('default');
 rng(0);
@@ -27,7 +31,8 @@ trainLabels = processLabels(trainLabels);
 testImages = processImages(testImages);
 testLabels = processLabels(testLabels);
 
-cx = 24; cy = 24;
+cx = 24; cy = 24; % Crop window size
+numRandomCrops = 4; % Number of random crops to average over for prediction
 testImages = single(testImages);
 trainImages = single(trainImages);
 croppedTrainImages = single(cropImageBatchRandom(trainImages, cx, cy));
@@ -36,14 +41,14 @@ croppedTrainImages = single(cropImageBatchRandom(trainImages, cx, cy));
 % TRAINING
 % ########################
 
-useBnorm = [0, 1];
-useCropping = [0, 1];
+useBnorm = [1];
+useCropping = [1];
 learningRate = [0.001, 0.01, 0.1];
 netID = [1, 2, 3];
 method = [1, 2];
-gpu = [1];
 
-
+% Set to IDs of GPUs to use for training
+gpu = [];
 
 results = zeros(1, 6);
 for nid = netID
@@ -65,18 +70,26 @@ for nid = netID
                     end
 
                     if m == 1
-                        net = cnnMNISTSGD(images, trainLabels, @getBatch, ...
+                        net = cnnTrainSGD(images, trainLabels, @getBatch, ...
                             'batchSize', bs, 'learningRate', lr, ...
                             'useCropping', cr, 'useBnorm', bn, 'netID', nid,'gpus',gpu);
                     else
-                        net = cnnMNISTAdam(images, trainLabels, @getBatch, ...
+                        net = cnnTrainAdam(images, trainLabels, @getBatch, ...
                             'batchSize', bs, 'learningRate', lr, ...
                             'useCropping', cr, 'useBnorm', bn, 'netID', nid,'gpus',gpu);
                     end
+                    net.layers{end}.class = testLabels;
                     if cr
-                        predictions = predictWithRandomCrop(net, testImages, testLabels, 10, cx, cy, 4);
+                        predictions = zeros(numRandomCrops, 10, size(testLabels, 2));
+                        for i = 1:numRandomCrops
+                            croppedImages = single(cropImageBatchRandom(testImages, cx, cy));
+                            res = vl_simplenn(net, croppedImages, [], [], 'disableDropout', true);
+                            predictions(i, :, :) = squeeze(res(end - 1).x);
+                        end
+                        predictions = mean(predictions, 1);
+                        [~, predictions] = sort(predictions, 2, 'descend');
+                        predictions = reshape(predictions(:, 1, :), 1, []);
                     else
-                        net.layers{end}.class = testLabels;
                         res = vl_simplenn(net, testImages, [], [], 'disableDropout', true);
                         predictions = squeeze(res(end - 1).x);
                         [~, predictions] = sort(predictions, 1, 'descend');
@@ -84,7 +97,7 @@ for nid = netID
                     end
                     acc = sum(predictions == testLabels) / numel(testLabels);
                     
-                    fprintf('method=%d,lr=%d,bn=%d,cr=%d,acc=%.4f\n', m, lr, bn, cr, acc);
+                    fprintf('net=%d,method=%d,lr=%d,bn=%d,cr=%d,acc=%.4f\n', nid, m, lr, bn, cr, acc);
                     results(end + 1, :) = [nid m lr bn cr acc];
                 end
             end

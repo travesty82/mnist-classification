@@ -1,5 +1,17 @@
 function net = cnnMNISTInitTensorFlow(opts)
+% CNNMNISTINITTENSORFLOW - Initializes a CNN based on the network recommended
+% in the TensorFlow documentation
 % http://www.tensorflow.org/versions/master/tutorials/mnist/pros/index.html
+%
+% INPUTS
+%   opts - Configuration options
+%       opts.useCropping - Whether data was preprocessed by randomly
+%       cropping windows (data augmentation)
+%       opts.useBnorm - Whether to insert batch normalization layers after
+%       convolution layers
+% OUTPUTS
+%   net - Initialized CNN
+%
 opts.f = 1/100;
 
 % Layer 1: Convolution Layer, 5x5 kernel, 32 features

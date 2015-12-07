@@ -1,10 +1,33 @@
-function net = cnnMNISTSGD(images, labels, getBatch, varargin)
+function net = cnnTrainSGD(images, labels, getBatch, varargin)
+%   CNNTRAINSGD - Trains a CNN using stochastic gradient descent with
+%   momentum and weight decay
+%
+%   INPUTS
+%       images - Matrix of training images. M x N x 1 x (number of images)
+%       labels - Matrix of training labels. 1 x (number of images)
+%       getBatch - Function handle for getting the next batch of training
+%       data. Should be in the form getBatch(images, labels, batchSize, batchNumber)
+%       varargin - Additional optional configuration parameters
+%           batchSize - Number of training samples per batch
+%           numEpochs - Number of training epochs
+%           learningRate - Learning rate for SGD
+%           momentum - Momentum for SGD
+%           weightDecay - Weight decay rate for SGD
+%           netID - ID of neural network type {1, 2, 3}
+%           useBnorm - Whether to use batch normalization
+%           useCropping - Whether images have been preprocessed by cropping
+%           random windows (data augmentation)
+%           gpus - IDs of GPU devices to use
+%
+%   OUTPUTS
+%       net - Trained CNN
+%
     % ########################
     % CONFIGURATION PARAMETERS
     % ########################
     
     opts.batchSize = 32;
-    opts.numEpochs = 20;
+    opts.numEpochs = 1;
     opts.learningRate = 0.01;
     opts.weightDecay = 0.001;
     opts.momentum = 0.9;

@@ -1,9 +1,29 @@
-function net = cnnMNISTAdam(images, labels, getBatch, varargin)
-    % ADAM Optimization algorithm as described in:
-    % * http://arxiv.org/pdf/1412.6980v8.pdf (Original Paper)
-    % * http://caffe.berkeleyvision.org/tutorial/solver.html (Caffe
-    % Implementation)
-
+function net = cnnTrainADAM(images, labels, getBatch, varargin)
+%   CNNTRAINADAM - Trains a CNN using the ADAM stochastic optimization
+%   algorithm, as described in http://arxiv.org/pdf/1412.6980v8.pdf and
+%   http://caffe.berkeleyvision.org/tutorial/solver.html
+%
+%   INPUTS
+%       images - Matrix of training images. M x N x 1 x (number of images)
+%       labels - Matrix of training labels. 1 x (number of images)
+%       getBatch - Function handle for getting the next batch of training
+%       data. Should be in the form getBatch(images, labels, batchSize, batchNumber)
+%       varargin - Additional optional configuration parameters
+%           batchSize - Number of training samples per batch
+%           numEpochs - Number of training epochs
+%           learningRate - Learning rate for ADAM
+%           momentum1 - Exponential decay rate for first moment estimate
+%           momentum2 - Exponential decay rate for second moment estimate
+%           epsilon - Epsilon parameter for ADAM
+%           netID - ID of neural network type {1, 2, 3}
+%           useBnorm - Whether to use batch normalization
+%           useCropping - Whether images have been preprocessed by cropping
+%           random windows (data augmentation)
+%           gpus - IDs of GPU devices to use
+%
+%   OUTPUTS
+%       net - Trained CNN
+%
     % ########################
     % CONFIGURATION PARAMETERS
     % ########################
