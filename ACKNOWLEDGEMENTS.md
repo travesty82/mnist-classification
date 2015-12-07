@@ -1,1 +1,3 @@
-* [`mnistHelper`](http://ufldl.stanford.edu/wiki/index.php/Using_the_MNIST_Dataset) *(CS @ Stanford University)* helper functions for loading image and label data from the raw MNIST data files
+* [`mnistHelper`](http://ufldl.stanford.edu/wiki/index.php/Using_the_MNIST_Dataset) *(CS @ Stanford University)* - helper functions for loading image and label data from the raw MNIST data files
+* [`MatConvNet`](http://www.vlfeat.org/matconvnet/) *(A. Vedaldi and K. Lenc)* - CNNs for MATLAB
+* [`SVM-KM`](http://asi.insa-rouen.fr/enseignants/~arakoto/toolbox/) *(A. Rakotomamonjy and S. Canu)* - SVM toolbox for MATLAB
