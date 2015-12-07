@@ -1,10 +1,10 @@
 % Test runner for classification of MNIST using CNNs
-% matconvnet must be in ../matconvnet
+% matconvnet must be in ./matconvnet
 % mnist data must be in ../mnist
 
 addpath('../third-party/mnistHelper');
-addpath('../matconvnet/matlab');
-run('../matconvnet/matlab/vl_setupnn.m');
+addpath('matconvnet/matlab');
+run('matconvnet/matlab/vl_setupnn.m');
 dataDir = '../mnist';
 
 rng('default');
