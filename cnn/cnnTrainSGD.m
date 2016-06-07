@@ -85,6 +85,7 @@ function net = cnnTrainSGD(images, labels, getBatch, varargin)
         for b = 1:numBatches
             [imb, lb] = getBatch(images, labels, opts.batchSize, b);
             net.layers{end}.class = lb;
+            net = vl_simplenn_tidy(net);
             res = vl_simplenn(net, imb, single(1), res);
             fprintf('Batch %d/%d (epoch %d/%d)\n', b, numBatches, e, opts.numEpochs);
             
@@ -93,12 +94,20 @@ function net = cnnTrainSGD(images, labels, getBatch, varargin)
                     continue;
                 end
                 for j = 1:numel(res(l).dzdw)
+                    if j == 3 && strcmp(net.layers{l}.type, 'bnorm')
+                        % special case for learning moments
+                        thisLR = net.layers{l}.learningRate(j);
+                        net.layers{l}.weights{j} = ...
+                            (1 - thisLR) * net.layers{l}.weights{j} + ...
+                            (thisLR/opts.batchSize) * res(l).dzdw{j};
+                    else                
                     net.layers{l}.momentum{j} = ...
                         opts.momentum * net.layers{l}.momentum{j} ...
                         - opts.weightDecay * net.layers{l}.weights{j} ...
                         - (1 / opts.batchSize) * res(l).dzdw{j};
                     net.layers{l}.weights{j} = net.layers{l}.weights{j} ...
                         + opts.learningRate * net.layers{l}.momentum{j};
+                    end
                 end
             end
         end
